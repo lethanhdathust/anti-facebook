@@ -29,14 +29,11 @@ public class JwtService {
 //    private long verifyToken;
 //    @Value("${application.security.jwt.secret-key}")
     private String secretKey = "04E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    @Value("${application.security.jwt.expiration}")
-    private long expiration;
+    private long expiration=86400000;
 
-    @Value("${application.security.jwt.refresh-token.expiration}")
-    private long refreshTokenExpiration;
+    private long refreshTokenExpiration=604800000;
 
-    @Value("${application.security.jwt.verify-token.expiration}")
-    private long verifyToken;
+    private long verifyToken =3600000;
 
     public <T> T extractClaim(String token, Function<Claims,T> claimsFunction){
         final  Claims claims = extractAllClaims(token);
