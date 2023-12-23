@@ -17,8 +17,18 @@ import java.util.function.Function;
 
 @Component
 public class JwtService {
-    @Value("${application.security.jwt.secret-key}")
-    private String secretKey;
+//    @Value("${application.security.jwt.secret-key}")
+//    private String secretKey;
+//    @Value("${application.security.jwt.expiration}")
+//    private long expiration;
+//
+//    @Value("${application.security.jwt.refresh-token.expiration}")
+//    private long refreshTokenExpiration;
+//
+//    @Value("${application.security.jwt.verify-token.expiration}")
+//    private long verifyToken;
+//    @Value("${application.security.jwt.secret-key}")
+    private String secretKey = "04E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
     @Value("${application.security.jwt.expiration}")
     private long expiration;
 
