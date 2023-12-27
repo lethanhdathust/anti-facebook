@@ -158,18 +158,18 @@ public class AccountServiceImpl implements AccountService {
             return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
-        var verifyToken = tokenRepo.findTokenByUserAndVerifyCode(account.get(),true);
-        if(verifyToken.isEmpty() )
-        {
-            var verifyCode  = jwtService.generateVerifyToken(account.get());
-
-        }
-        Date timeCreateTokenAt =  JwtUtils.getCreateAt( jwtService,verifyToken.get().token);
-        if((new Date(System.currentTimeMillis()).getTime() -  timeCreateTokenAt.getTime()) < 120000)
-        {
-            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
-
-        }
+//        var verifyToken = tokenRepo.findTokenByUserAndVerifyCode(account.get(),true);
+//        if(verifyToken.isEmpty() )
+//        {
+//            var verifyCode  = jwtService.generateVerifyToken(account.get());
+//
+//        }
+//        Date timeCreateTokenAt =  JwtUtils.getCreateAt( jwtService,verifyToken.get().token);
+//        if((new Date(System.currentTimeMillis()).getTime() -  timeCreateTokenAt.getTime()) < 120000)
+//        {
+//            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
+//
+//        }
 
 //        if(account.get())
 
