@@ -29,6 +29,16 @@ public class Token {
 
     public boolean isVerifyCode = false;
 
+    public Token(Long id, String token, TokenType tokenType, boolean revoked, boolean expired, User user, boolean isVerifyCode) {
+        this.id = id;
+        this.token = token;
+        this.tokenType = tokenType;
+        this.revoked = revoked;
+        this.expired = expired;
+        this.user = user;
+        this.isVerifyCode = isVerifyCode;
+    }
+
     public Token(Long id, String token, TokenType tokenType, boolean revoked, boolean expired, User user) {
         this.id = id;
         this.token = token;
