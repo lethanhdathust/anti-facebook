@@ -26,5 +26,9 @@ public class JwtUtils {
         return jwtService.extractCreateAt(token);
     }
 
+    public static Date getExpiredAt(JwtService jwtService,  String token) {
+
+        return jwtService.extractExpriedAt(token);
+    }
 
 }

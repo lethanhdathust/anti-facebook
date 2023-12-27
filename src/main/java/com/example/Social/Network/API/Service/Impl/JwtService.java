@@ -74,7 +74,9 @@ public class JwtService {
     public Date extractCreateAt(String token){
         return extractClaim(token, Claims::getIssuedAt);
     }
-
+    public Date extractExpriedAt(String token){
+        return extractClaim(token, Claims::getExpiration);
+    }
     private Date extractExpiration(String token){
         return extractClaim(token,Claims::getExpiration);
     }

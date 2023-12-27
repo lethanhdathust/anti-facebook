@@ -144,25 +144,26 @@ public class AccountServiceImpl implements AccountService {
     public GeneralResponse getVerifyCode(String email) throws ResponseException, ExecutionException, InterruptedException, TimeoutException {
         if( !CheckUtils.isValidEmail(email ))
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The email is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
         var account = userRepo.findByEmail(email);
         if(account.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"User is not exists");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED);
 
         }
         if(account.get().isActive())
         {
-            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE,"User has been active");
+            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
         var verifyCode  = jwtService.generateVerifyToken(account.get());
+//        if(account.get())
          Date timeCreateTokenAt =  JwtUtils.getCreateAt( jwtService,verifyCode);
-        if(new Date(System.currentTimeMillis()).getTime() -  timeCreateTokenAt.getTime() < 120000)
+        if((new Date(System.currentTimeMillis()).getTime() -  timeCreateTokenAt.getTime()) < 120000)
         {
-            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE,"Can not execute this operation");
+            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
         return new GeneralResponse(ResponseCode.OK_CODE,ResponseMessage.OK_CODE,new SignUpResDto(email,verifyCode));
@@ -225,16 +226,22 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public GeneralResponse changeInfoAfterSignup(String token, String username, MultipartFile avatar) throws ResponseException, ExecutionException, InterruptedException, TimeoutException {
+       if(token ==null || token.isEmpty())
+       {
+           return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID);
+
+       }
+
         var userInToken = JwtUtils.getUserFromToken(jwtService,userRepo,token);
 
         var user = userRepo.findByEmail(userInToken.getEmail());
-        if(token.isEmpty()|| user.isEmpty())
+        if(user.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID, "The Token is invalid ");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED, ResponseMessage.USER_NOT_VALIDATED);
         }
         if(!CheckUtils.isValidUsername(username,user.get().getEmail()))
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID, "The username is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
 
 //        if(avatar.isOverSize)
