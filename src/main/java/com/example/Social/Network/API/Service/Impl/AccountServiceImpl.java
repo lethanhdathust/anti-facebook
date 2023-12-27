@@ -103,7 +103,7 @@ public class AccountServiceImpl implements AccountService {
 
         var token  = jwtService.generateVerifyToken(user);
         signUpRepo.save(user);
-        saveVerifyCode(user, token);
+        saveUserToken(user, token);
         return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE,new SignUpResDto(user.getEmail(),token ) );
 
     }
@@ -499,20 +499,20 @@ public class AccountServiceImpl implements AccountService {
                 .build();
         tokenRepo.save(token);
     }
-    private void saveVerifyCode(User user, String jwtToken) {
-        var token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .isVerifyCode(true)
-                .build()
-
-                ;
-
-        tokenRepo.save(token);
-    }
+//    private void saveVerifyCode(User user, String jwtToken) {
+//        var token = Token.builder()
+//                .user(user)
+//                .token(jwtToken)
+//                .tokenType(TokenType.BEARER)
+//                .expired(false)
+//                .revoked(false)
+//                .isVerifyCode(true)
+//                .build()
+//
+//                ;
+//
+//        tokenRepo.save(token);
+//    }
 
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepo.findAllValidTokenByUser(user.getId());
