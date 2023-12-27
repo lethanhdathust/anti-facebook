@@ -110,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public GeneralResponse checkVerifyCode(String email, String verifyToken) throws ResponseException {
-        if(verifyToken==null)
+        if(verifyToken==null || verifyToken.isEmpty())
         {
             return new GeneralResponse(ResponseCode.PARAMETER_NOT_ENOUGH,ResponseMessage.PARAMETER_NOT_ENOUGH);
 
@@ -128,11 +128,6 @@ public class AccountServiceImpl implements AccountService {
 
         }
         var verifyCode = tokenRepo.findTokenByToken(verifyToken);
-        if(verifyCode.isEmpty())
-        {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
-
-        }
         if(account.get().isActive())
         {
             return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
