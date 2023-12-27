@@ -77,18 +77,18 @@ public class AccountServiceImpl implements AccountService {
     public GeneralResponse  signUp(SignUpReqDto signUpReqDto) throws ResponseException, ExecutionException, InterruptedException, TimeoutException {
 
         if(!CheckUtils.isValidEmail(signUpReqDto.getEmail())){
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The email is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
 
         if (signUpRepo.existsByEmail(signUpReqDto.getEmail())){
-            return new GeneralResponse(ResponseCode.USER_EXISTED, ResponseMessage.USER_EXISTED, "There is an account with that email address :"+ signUpReqDto.getEmail());
+            return new GeneralResponse(ResponseCode.USER_EXISTED, ResponseMessage.USER_EXISTED);
         }
 
         else if (signUpReqDto.getEmail().isEmpty() && signUpReqDto.getPassword().isEmpty()){
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"Your email and password are not filled in yet" );
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
         else if (!CheckUtils.isValidPassword(signUpReqDto.getPassword())){
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The password are not valid" );
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
 
@@ -110,27 +110,32 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public GeneralResponse checkVerifyCode(String email, String verifyToken) throws ResponseException {
+        if(verifyToken==null)
+        {
+            return new GeneralResponse(ResponseCode.PARAMETER_NOT_ENOUGH,ResponseMessage.PARAMETER_NOT_ENOUGH);
+
+        }
 
         if(!CheckUtils.isValidEmail(email)){
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The email is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
         var account = userRepo.findByEmail(email);
 
         if(account.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"User is not exists");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED);
 
 
         }
         var verifyCode = tokenRepo.findTokenByToken(verifyToken);
         if(verifyCode.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The verifyCode is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
         if(account.get().isActive())
         {
-            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE,"The user has been active");
+            return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
         account.get().setActive(true);
