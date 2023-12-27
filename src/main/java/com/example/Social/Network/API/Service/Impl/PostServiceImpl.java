@@ -178,28 +178,17 @@ private MarkRepo markRepo;
         }
 
         Post post = postRepo.findById(Id).orElseThrow();
-try { }
-catch (RuntimeException e) {
-        return new GeneralResponse(ResponseCode.POST_NOT_EXIST, ResponseMessage.POST_NOT_EXIST, "");
-    }
+
+        if (postRepo.findById(Id).isEmpty()) {
+            return new GeneralResponse(ResponseCode.POST_NOT_EXIST, ResponseMessage.POST_NOT_EXIST, "");
+        }
 
     List<Image> images = post.getImages();
 
-//    for (Image image : images) {
-//        ImageResDto imageResDto = new ImageResDto();
-//        imageResDto.setUrl(image.getUrlImage());
-//        imageResDto.setId(String.valueOf(image.getId()));
-//        imageResDtos.add(imageResDto);
-//    }
+
 
     List<Video> videos = post.getVideos();
-//    List<VideoResDto> videoResDtos = new ArrayList<>();
-//    for (Video video : videos) {
-//        VideoResDto videoResDto = new VideoResDto();
-//        videoResDto.setUrl(video.getUrl());
-//        videoResDto.setThumb(video.getThumb());
-//        videoResDtos.add(videoResDto);
-//    }
+
 
     Author author = new Author();
     author.setId(String.valueOf(user.getId()));
@@ -233,8 +222,6 @@ catch (RuntimeException e) {
     getPostResDto.setCategory(category);
     System.out.println(getPostResDto);
     return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE, getPostResDto);
-
-
 
         }
 
@@ -316,7 +303,7 @@ catch (RuntimeException e) {
             return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID,"");
         }
         Post existPost = postRepo.findAllById(Id);
-        existPost.setUser(user);
+
 
         if (!user.isAccountNonExpired()) {
             return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"");
@@ -348,7 +335,7 @@ catch (RuntimeException e) {
         }
 
         if (!image_sort.isEmpty()) {
-            List<Long> imageIds = Arrays.stream(image_sort.split(",")).map(Long::parseLong).collect(Collectors.toList());
+            List<Long> imageIds = Arrays.stream(image_sort.split(",")).map(Long::parseLong).toList();
             ArrayList<Image> sortedImage = (ArrayList<Image>) existPost
                     .getImages()
                     .stream()
@@ -358,10 +345,8 @@ catch (RuntimeException e) {
             existPost.setImages(sortedImage);
         }
 
-        if (existPost.getVideos().isEmpty() || existPost.getImages().isEmpty() ||
-                (existPost.getVideos().isEmpty()&&existPost.getImages().isEmpty()) ) {
-                if (existPost.getDescribed().equals(described) || existPost.getStatus().equals(status)
-                        || (existPost.getDescribed().equals(described))&&existPost.getStatus().equals(status)) {
+        if (existPost.getVideos().isEmpty() || existPost.getImages().isEmpty()) {
+                if (existPost.getDescribed().equals(described) || existPost.getStatus().equals(status)) {
                     existPost.setDescribed(described);
                     existPost.setStatus(status);
 
@@ -371,10 +356,6 @@ catch (RuntimeException e) {
                 }
         }
 
-
-        if (!jwtService.isTokenValid(token , user)){
-            return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID,"");
-        }
         existPost.setStatus(status);
         existPost.setDescribed(described);
         List<String> words = Arrays.asList("giet","chem","dam","mau","danh nhau");
