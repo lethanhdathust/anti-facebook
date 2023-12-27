@@ -177,53 +177,57 @@ private MarkRepo markRepo;
 
         }
 
-        Post post = postRepo.findById(Id).orElseThrow();
+        Post post;
+        try {
+            post = postRepo.findById(Id).orElseThrow();
 
+        } catch (Exception e) {
+            return new GeneralResponse(ResponseCode.POST_NOT_EXIST, ResponseMessage.POST_NOT_EXIST);
+        }
         if (postRepo.findById(Id).isEmpty()) {
             return new GeneralResponse(ResponseCode.POST_NOT_EXIST, ResponseMessage.POST_NOT_EXIST, "");
         }
 
-    List<Image> images = post.getImages();
+        List<Image> images = post.getImages();
 
 
+        List<Video> videos = post.getVideos();
 
-    List<Video> videos = post.getVideos();
 
-
-    Author author = new Author();
-    author.setId(String.valueOf(user.getId()));
-    author.setName(user.getUsername());
-    author.setAvatar(user.getAvatar());
-    author.setCoins(String.valueOf(user.getCoins()));
+        Author author = new Author();
+        author.setId(String.valueOf(user.getId()));
+        author.setName(user.getUsername());
+        author.setAvatar(user.getAvatar());
+        author.setCoins(String.valueOf(user.getCoins()));
 //    author.setListings(user.getListing().toString());
-    System.out.println(author);
+        System.out.println(author);
 
-    Category category = new Category();
-    category.setId(category.getId());
-    category.setName(category.getName());
-    category.setHas_name(category.getHas_name());
-    System.out.println(category);
-    GetPostResDto getPostResDto = new GetPostResDto();
-    getPostResDto.setId(post.getId());
-    getPostResDto.setUrl(post.getUrl());
-    getPostResDto.setCreated(String.valueOf(post.getCreated()));
-    getPostResDto.setModified(String.valueOf(post.getModified()));
-    getPostResDto.setDisappointed(String.valueOf(post.getDissapointed()));
-    getPostResDto.setKudos(String.valueOf(post.getKudos()));
+        Category category = new Category();
+        category.setId(category.getId());
+        category.setName(category.getName());
+        category.setHas_name(category.getHas_name());
+        System.out.println(category);
+        GetPostResDto getPostResDto = new GetPostResDto();
+        getPostResDto.setId(post.getId());
+        getPostResDto.setUrl(post.getUrl());
+        getPostResDto.setCreated(String.valueOf(post.getCreated()));
+        getPostResDto.setModified(String.valueOf(post.getModified()));
+        getPostResDto.setDisappointed(String.valueOf(post.getDissapointed()));
+        getPostResDto.setKudos(String.valueOf(post.getKudos()));
 //    getPostResDto.setFake(String.valueOf(Long.valueOf(post.getFake())));
         getPostResDto.setFake("");
 //    getPostResDto.setTrust(String.valueOf(Long.valueOf(post.getTrust())));
         getPostResDto.setTrust("");
-    getPostResDto.setIsMarked(String.valueOf(post.isMarked()));
-    getPostResDto.setIsRated(String.valueOf(post.isRated()));
-    getPostResDto.setImage(images);
-    getPostResDto.setVideo(videos);
-    getPostResDto.setAuthor(author);
-    getPostResDto.setCategory(category);
-    System.out.println(getPostResDto);
-    return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE, getPostResDto);
+        getPostResDto.setIsMarked(String.valueOf(post.isMarked()));
+        getPostResDto.setIsRated(String.valueOf(post.isRated()));
+        getPostResDto.setImage(images);
+        getPostResDto.setVideo(videos);
+        getPostResDto.setAuthor(author);
+        getPostResDto.setCategory(category);
+        System.out.println(getPostResDto);
+        return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE, getPostResDto);
 
-        }
+    }
 
 
     @Override
