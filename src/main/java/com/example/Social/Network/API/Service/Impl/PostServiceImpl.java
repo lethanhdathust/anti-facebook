@@ -72,6 +72,7 @@ private MarkRepo markRepo;
 @Override
     public GeneralResponse addPost(String token, MultipartFile image, MultipartFile video, String described, String status)
             throws ResponseException, ExecutionException, InterruptedException, TimeoutException {
+
     User user = getUserFromToken(jwtService,userRepo, token);
     if(user == null)
     {
@@ -79,7 +80,7 @@ private MarkRepo markRepo;
 
     }
     if (!jwtService.isTokenValid(token , user)){
-        return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID,"");
+        return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID);
     }
     Post post1 = new Post();
     post1.setUser(user);

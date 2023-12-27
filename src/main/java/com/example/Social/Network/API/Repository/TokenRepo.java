@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface TokenRepo extends JpaRepository<Token,Long> {
+    Optional<Token> findTokenByUserAndVerifyCode(User user, boolean verifyCode);
     Optional<Token> findTokenByToken(String token);
     @Query(value = """
       select t from Token t inner join User u\s

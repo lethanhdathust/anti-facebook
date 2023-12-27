@@ -103,7 +103,7 @@ public class AccountServiceImpl implements AccountService {
 
         var token  = jwtService.generateVerifyToken(user);
         signUpRepo.save(user);
-        saveUserToken(user, token);
+        saveVerifyCode(user, token);
         return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE,new SignUpResDto(user.getEmail(),token ) );
 
     }
@@ -158,36 +158,44 @@ public class AccountServiceImpl implements AccountService {
             return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
-        var verifyCode  = jwtService.generateVerifyToken(account.get());
-//        if(account.get())
-         Date timeCreateTokenAt =  JwtUtils.getCreateAt( jwtService,verifyCode);
+        var verifyToken = tokenRepo.findTokenByUserAndVerifyCode(account.get(),true);
+        if(verifyToken.isEmpty() )
+        {
+            var verifyCode  = jwtService.generateVerifyToken(account.get());
+
+        }
+        Date timeCreateTokenAt =  JwtUtils.getCreateAt( jwtService,verifyToken.get().token);
         if((new Date(System.currentTimeMillis()).getTime() -  timeCreateTokenAt.getTime()) < 120000)
         {
             return new GeneralResponse(ResponseCode.ACTION_BEEN_DONE_PRE,ResponseMessage.ACTION_BEEN_DONE_PRE);
 
         }
-        return new GeneralResponse(ResponseCode.OK_CODE,ResponseMessage.OK_CODE,new SignUpResDto(email,verifyCode));
+
+//        if(account.get())
+
+        return new GeneralResponse(ResponseCode.OK_CODE,ResponseMessage.OK_CODE,"new SignUpResDto(email,verifyCode)");
+
     }
 
     @Override
     public GeneralResponse login(SignInReqDto signInReqDto) throws ResponseException, ExecutionException, InterruptedException, TimeoutException {
         if( !CheckUtils.isValidEmail( signInReqDto.getEmail() )  )
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The email is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
         if(!CheckUtils.isValidPassword(signInReqDto.getPassword())){
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The password is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
         var account = userRepo.findByEmail(signInReqDto.getEmail());
         if(account.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"User is not exists");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED);
 
         }
         if(!account.get().isActive())
         {
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"User is not validated");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED);
 
         }
 
@@ -199,7 +207,7 @@ public class AccountServiceImpl implements AccountService {
                     )
             );
         } catch (Exception e) {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The user name or password is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
 
@@ -215,13 +223,13 @@ public class AccountServiceImpl implements AccountService {
 
         if(token.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.TOKEN_INVALID,ResponseMessage.TOKEN_INVALID,"Token is invalid");
+            return new GeneralResponse(ResponseCode.TOKEN_INVALID,ResponseMessage.TOKEN_INVALID);
         }
        var user =  JwtUtils.getUserFromToken(jwtService ,userRepo ,token);
 
         tokenRepo.deleteTokenByUserId(user.getId());
 
-        return  new GeneralResponse(ResponseCode.OK_CODE,ResponseMessage.OK_CODE,"Logout success");
+        return  new GeneralResponse(ResponseCode.OK_CODE,ResponseMessage.OK_CODE);
     }
 
     @Override
@@ -260,17 +268,17 @@ public class AccountServiceImpl implements AccountService {
 
         if(password.isEmpty()|| newPassword.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID, "The password is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
         if(!CheckUtils.isValidPassword(newPassword))
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID, "The new Password is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
         int n = lcs(password, newPassword);
         if ((double) n / password.length() >= 0.8 || (double) n / newPassword.length() >= 0.8) {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID, "The Param is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
 
 
@@ -278,7 +286,7 @@ public class AccountServiceImpl implements AccountService {
         var user =JwtUtils.getUserFromToken(jwtService,userRepo,token);
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
-        return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE, "Change password success");
+        return new GeneralResponse(ResponseCode.OK_CODE, ResponseMessage.OK_CODE);
     }
 
     @Override
@@ -291,37 +299,37 @@ public class AccountServiceImpl implements AccountService {
 
         if(token.isEmpty())
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_NOT_ENOUGH,ResponseMessage.PARAMETER_NOT_ENOUGH,"The parameter is not enough");
+            return new GeneralResponse(ResponseCode.PARAMETER_NOT_ENOUGH,ResponseMessage.PARAMETER_NOT_ENOUGH);
 
         }
 
 
             if(username!=null&&  !CheckUtils.isValidUsernameNoEmail(username))
             {
-                return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The username is not valid");
+                return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
             }
 
 
 
         if(description.length() > 150 )
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID,"The description is not valid");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID,ResponseMessage.PARAMETER_VALUE_NOT_VALID);
         }
         var user = JwtUtils.getUserFromToken(jwtService,userRepo,token);
         if(!userRepo.existsUserById(user.getId()))
         {
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED,"The User is not valid");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED,ResponseMessage.USER_NOT_VALIDATED);
 
         }
         if(!user.isActive())
         {
-            return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS,"The user is block by the system");
+            return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS);
         }
         for (String a:blockedAddress
              ) {
             if(address.contains(a) || city.contains(a)||country.contains(a))
             {
-                return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS,"The country does not support , you need logout");
+                return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS);
 
             }
         }
@@ -329,7 +337,7 @@ public class AccountServiceImpl implements AccountService {
             var domainName =  CheckUtils.extractDomainName(l);
             if(link.equals(domainName))
             {
-                return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS,"The Link is blocked");
+                return new GeneralResponse(ResponseCode.NOT_ACCESS,ResponseMessage.NOT_ACCESS);
 
             }
         }
@@ -397,11 +405,11 @@ public class AccountServiceImpl implements AccountService {
 
         if (userInfo.isEmpty()) {
 
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED, ResponseMessage.USER_NOT_VALIDATED, "The User is not exists");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED, ResponseMessage.USER_NOT_VALIDATED);
 
         }
         if(!userInfo.get().isActive()){
-            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED, ResponseMessage.USER_NOT_VALIDATED, "The User has been blocked");
+            return new GeneralResponse(ResponseCode.USER_NOT_VALIDATED, ResponseMessage.USER_NOT_VALIDATED);
         }
 
         int numberFriendOfUser= friendListRepo.findUserFriendByTheUserIdNotPageable(userId ).size();
@@ -421,7 +429,7 @@ public class AccountServiceImpl implements AccountService {
 
         if(token==null||token.isEmpty()||last_updated==null|| last_updated.isEmpty() )
         {
-            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID,"");
+            return new GeneralResponse(ResponseCode.PARAMETER_VALUE_NOT_VALID, ResponseMessage.PARAMETER_VALUE_NOT_VALID);
 
         }
 
@@ -433,7 +441,7 @@ public class AccountServiceImpl implements AccountService {
         }
         if(!jwtService.isTokenValid(token,user))
         {
-            return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID,"The Token is not valid");
+            return new GeneralResponse(ResponseCode.TOKEN_INVALID, ResponseMessage.TOKEN_INVALID);
 
         }
         UserResItem userResItem = new UserResItem(user.getId().toString(),user.isEnabled() ? "1":"0");
@@ -489,6 +497,20 @@ public class AccountServiceImpl implements AccountService {
                 .expired(false)
                 .revoked(false)
                 .build();
+        tokenRepo.save(token);
+    }
+    private void saveVerifyCode(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .isVerifyCode(true)
+                .build()
+
+                ;
+
         tokenRepo.save(token);
     }
 

@@ -27,6 +27,8 @@ public class Token {
     @JoinColumn(name = "user_id")
     public User user;
 
+    public boolean isVerifyCode = false;
+
     public Token(Long id, String token, TokenType tokenType, boolean revoked, boolean expired, User user) {
         this.id = id;
         this.token = token;
